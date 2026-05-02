@@ -1,62 +1,85 @@
-autoload -Uz compinit && compinit
-
+# Kiro CLI pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
 bindkey -e
 
 setopt auto_cd
 setopt correct
 setopt hist_ignore_all_dups
-setopt hist_ignore_dups
 setopt hist_reduce_blanks
 setopt no_beep
 setopt share_history
 
+# alias
 alias ls='ls -G -F'
 alias ll='ls -l'
 alias la='ls -la'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias sed='gsed'
 alias d='docker'
 alias dc='docker compose'
 alias tf='terraform'
 alias tg='terragrunt'
+alias cc='claude'
+alias ccp='claude -p'
+alias ccc='claude -c'
+alias ccr='claude -r'
+alias ccu='claude update'
+alias ccd='claude --dangerously-skip-permissions'
+alias cccd='claude -c --dangerously-skip-permissions'
+alias ccrd='claude -r --dangerously-skip-permissions'
+alias cx='codex'
+alias gemini="/opt/homebrew/bin/gemini"
+alias gc='gemini'
+alias kc='kiro-cli'
 
-# pure
-fpath+=$HOME/.zsh/pure
-autoload -Uz promptinit; promptinit
-zstyle :prompt:pure:path color cyan
-zstyle ':prompt:pure:prompt:*' color green
-prompt pure
+# prompt
+PROMPT='%F{cyan}%1~%f %F{green}❯%f '
+
+# cursor blinking
+printf '\e[2 q'
+
+# completion
+autoload -Uz compinit
+# -C: Use cache, -u: Skip security check
+compinit -C -u
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# Docker CLI completions
+fpath=(/Users/sota/.docker/completions $fpath)
 
 # fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if type fzf > /dev/null 2>&1; then
+    eval "$(fzf --zsh)"
+fi
+
+# locale
+export LANG=ja_JP.UTF-8
+export LC_ALL=ja_JP.UTF-8
 
 # os
-export LANG=ja_JP.UTF-8
 export CLICOLOR=1
 export LSCOLORS=gxfxcxdxbxegedabagacad
-# export PS1="%1~ %# "
 
-# openssl@1.1
-export PATH="/opt/homebrew/opt/openssl@1.1/bin:$PATH"
-export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
-export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@1.1/lib/pkgconfig"
+# homebrew
+export HOMEBREW_NO_ENV_HINTS=1
 
-# Go
+# go
 export GO111MODULE=on
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOPATH/bin
 
-# rbenv
-export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
-eval "$(rbenv init - zsh)"
+# aqua
+export PATH="/Users/sota/.local/share/aquaproj-aqua/bin:$PATH"
 
-# pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# asdf
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 
-# nodebrew
-export PATH=$HOME/.nodebrew/current/bin:$PATH
+# postgres
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+
+# aws
+export AWS_DEFAULT_PROFILE=moto
+
+# Kiro CLI post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
